@@ -1,0 +1,7 @@
+langchain-groq
+python-dotenv
+youtube_transcript_api
+langchain
+langchain-ai21
+faiss-cpu
+langchainhub
