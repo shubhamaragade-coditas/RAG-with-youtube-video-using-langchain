@@ -5,3 +5,5 @@ langchain
 langchain-ai21
 faiss-cpu
 langchainhub
+pytube
+requests

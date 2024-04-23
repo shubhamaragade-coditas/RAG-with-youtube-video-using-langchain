@@ -5,7 +5,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_ai21 import AI21Embeddings
 from langchain import hub
 from langchain.chains import RetrievalQA
-from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
@@ -52,7 +52,9 @@ def get_answer_from_AI(
     """Gets an answer to a question using a RetrievalQA chain with the provided vector store and question."""
 
     PROMPT: str = get_prompt()
-    llm: ChatGroq = ChatGroq(temperature=0, model_name="mixtral-8x7b-32768")
+    # llm: ChatGroq = ChatGroq(temperature=0, model_name="mixtral-8x7b-32768")
+    llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    
 
     qa_chain: RetrievalQA = RetrievalQA.from_chain_type(
         llm, retriever=vector_db.as_retriever(), chain_type_kwargs={"prompt": PROMPT}
