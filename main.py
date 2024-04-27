@@ -27,8 +27,7 @@ def extract_transcript_from_video(youtube_video_url: str) -> str:
 def text_to_chunks(transcript: str, chunk_size: int, chunk_overlap: int) -> list[str]:
     """Splits text data into chunks of a specified size with optional overlap."""
     text_splitter: RecursiveCharacterTextSplitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap
-    )
+        chunk_size=chunk_size, chunk_overlap=chunk_overlap   )
     all_splits: list[str] = text_splitter.split_text(transcript)
     return all_splits
 
@@ -52,10 +51,8 @@ def get_answer_from_AI(
     """Gets an answer to a question using a RetrievalQA chain with the provided vector store and question."""
 
     PROMPT: str = get_prompt()
-    # llm: ChatGroq = ChatGroq(temperature=0, model_name="mixtral-8x7b-32768")
     llm = ChatGoogleGenerativeAI(model="gemini-pro")
     
-
     qa_chain: RetrievalQA = RetrievalQA.from_chain_type(
         llm, retriever=vector_db.as_retriever(), chain_type_kwargs={"prompt": PROMPT}
     )
@@ -66,17 +63,24 @@ def get_answer_from_AI(
 
 youtube_video_url: str = input("Enter the url: ")
 
-transcript: str = extract_transcript_from_video(youtube_video_url=youtube_video_url)
+try:
+    transcript: str = extract_transcript_from_video(youtube_video_url=youtube_video_url)
 
-transcript_chunks: list[str] = text_to_chunks(transcript=transcript, chunk_size=100, chunk_overlap=20)
+    transcript_chunks: list[str] = text_to_chunks(transcript=transcript, chunk_size=500, chunk_overlap=50)
 
-transcript_embddings: FAISS = generate_embeddings(chunks=transcript_chunks)
+    transcript_embddings: FAISS = generate_embeddings(chunks=transcript_chunks)
 
-continue_asking: bool = True
-while(continue_asking):
-    question: str = input("Enter your question: ")
-    answer: str = get_answer_from_AI(vector_db=transcript_embddings,question=question)
-    print(f"User: {question}\nAI: {answer}")
+    continue_asking: bool = True
+    while(continue_asking):
+        question: str = input("Enter your question: ")
+        answer: str = get_answer_from_AI(vector_db=transcript_embddings,question=question)
+        print(f"User: {question}\nAI: {answer}")
 
-    continue_asking = int(input("Do you want to continue:\n 0. No\n 1. Yes"))
+        try:
+            continue_asking = int(input("Do you want to continue:\n 0. No\n 1. Yes"))
+        except ValueError:
+            print("Invalid input")
+            continue_asking = True
 
+except Exception as e:
+    print(f"An error occurred: {e}")
